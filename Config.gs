@@ -22,7 +22,7 @@ var DAY_OF_THE_WEEK = String(AGENDA_TEMPLATE_SHEET.getRange(DAY_OF_THE_WEEK_CELL
 // Meetings Event Details
 const ActiveSpreadsheet = SpreadsheetApp.getActiveSpreadsheet()
 const MEETIING_NAME = ActiveSpreadsheet.getName().split(" |",1)
-/*
+
   // Start Time
   const START_TIME = AGENDA_TEMPLATE_SHEET.getRange("C5").getValue()
     const START_TIME_HOURS = START_TIME.split(":",1)
@@ -32,7 +32,7 @@ const MEETIING_NAME = ActiveSpreadsheet.getName().split(" |",1)
   const END_TIME = AGENDA_TEMPLATE_SHEET.getRange("C6").getValue()
     const END_TIME_HOURS = END_TIME.split(":",1)
     const END_TIME_MINUTES = END_TIME.split(":",2).slice(1,2)
-*/
+
 // Day of the week
 const DATE_FORMAT = "dd/MM/yy"
 const TIMEZONE = Session.getScriptTimeZone()

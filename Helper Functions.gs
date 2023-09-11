@@ -345,3 +345,83 @@ function linkCellContents(label,url,sheet,cell)
    
  range.setRichTextValue(richValue.build());
 }
+
+
+//Confirmation Alert
+/**
+ * Displays a custom alert dialog box in Google Apps Script.
+ *
+ * This function creates and displays an alert dialog with the specified title, message, and
+ * customizable button options. It returns the user's response to the dialog.
+ * @param {string} title - The title to display in the dialog box.
+ * @param {string} message - The message to display in the dialog box.
+ * @param {GoogleAppsScript.Base.Ui.ButtonSet} buttonsSet - The set of buttons to display in the dialog box.
+ *   Possible values are:
+ *   - `ui.ButtonSet.OK`: Display an OK button.
+ *   - `ui.ButtonSet.OK_CANCEL`: Display OK and Cancel buttons.
+ *   - `ui.ButtonSet.YES_NO`: Display Yes and No buttons.
+ *   - `ui.ButtonSet.YES_NO_CANCEL`: Display Yes, No, and Cancel buttons.
+ *
+ * @returns {GoogleAppsScript.Base.Ui.Button} The button that was clicked in the dialog box.
+ */
+function showAlert(title, message, buttonsOptions)
+{
+  var ui = SpreadsheetApp.getUi()
+  var response  = ui.alert(String(title), String(message), buttonsOptions)
+  return response
+}
+
+
+function isDateValid(datetimeString)
+{
+  // Date format dd/MM/yyyy
+  const expectedDateRegEx = /^\d{2}\/\d{2}\/\d{4}, \d{2}:\d{2}-\d{2}:\d{2}$/
+  const Demo_datetimeString = "15/09/2023, 15:30-17:00"
+  if (datetimeString.length < Demo_datetimeString.length) {return {status: false}}
+  
+  var date = String(datetimeString).split(", ")[0]
+  var timeStart = String(datetimeString).split(", ")[1].split("-")[0]
+  var timeEnd = String(datetimeString).split(", ")[1].split("-")[1]
+
+  // Test the input string against the pattern
+  var match = datetimeString.match(expectedDateRegEx);
+
+  if (!match) {
+    Logger.log(`The string '${datetimeString}' format doesn't match "dd/MM/yyyy, HH:mm-HH:mm"`)
+    return outputObj = {status: false}; // The string format doesn't match "dd/MM/yyyy"
+  }
+  
+  Logger.log("date " + date)
+  var dateInQuestion = new Date(date.split("/")[2], date.split("/")[1] - 1, date.split("/")[0], null,null,null,null)
+  Logger.log("dateInQuestion " + dateInQuestion)
+  var day = dateInQuestion.getDate()
+  var month = dateInQuestion.getMonth()
+  var year = dateInQuestion.getFullYear()
+
+  // Check if the extracted day and month are within valid ranges
+  if (day < 1 || day > 31 || month < 1 || month > 12) {
+    Logger.log("Day or month is out of range.")
+    return outputObj = {status: false} // Day or month is out of range
+  }
+  else if ((year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0) === false && month === 2 && day > 28) 
+  {
+    Logger.log("Febuary has more than 28 days in a non-leap year.")
+    return outputObj = {status: false}
+  }
+  else if (((year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0) === true && month === 2 && day > 29) || ([4, 6, 9, 11].includes(month) === true && day > 30)) 
+  {
+    Logger.log("Febuary has more than 29 days in a leap year OR a 20 day month has mpre than 30 days.")
+    return outputObj = {status: false}
+  }
+  else 
+  { 
+    Logger.log("Valid Date.")
+    outputObj = {
+      status: true, 
+      startDate: new Date(year, month, day, timeStart.split(":")[0], timeStart.split(":")[1], null, null),
+      endDate: new Date(year, month, day, timeEnd.split(":")[0], timeEnd.split(":")[1], null, null)
+      }
+    Logger.log(outputObj)
+    return outputObj
+  }
+}
