@@ -1,3 +1,5 @@
+const ss = SpreadsheetApp.getActiveSpreadsheet()
+
 // Agenda Sheet Template
 const AGENDA_TEMPLATE_SHEET = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('#No | Date')
 
@@ -17,6 +19,10 @@ const MEETING_NOTES_FOLDER_LINK_CELL = "G3"
 const MEETING_CALENDAR_LINK_CELL = "G4"
 
 var DAY_OF_THE_WEEK = String(AGENDA_TEMPLATE_SHEET.getRange(DAY_OF_THE_WEEK_CELL).getValue())
+
+
+// If this is "Time-driven Meeting Generation" the timeTriggered function will generate meeting essentials.
+const Time_Driven_Meeting_Generation = AGENDA_TEMPLATE_SHEET.getRange("C2").getValue()
 
 
 // Meetings Event Details
@@ -45,10 +51,11 @@ var DAY_OF_THE_WEEK = String(AGENDA_TEMPLATE_SHEET.getRange(DAY_OF_THE_WEEK_CELL
 const EVENT_DESCRIPTION = "Yet another Meeting..."
 const EVENT_LOCATION = "📞 Google Meet"
 
-  // Guests
-  const EVENT_GUESTS = ["inikolarakis+esntest@gmail.com"]
+  // Guests. Up to 5 fixed Guests.
+  const EVENT_GUESTS = ["board@esngreece.gr"]
   //Example: EVENT_GUESTS = ["board@esnsection.org"]
 
 // Calendar ID to create the Event
 const CALENDAR_ID = "c_899b9a4fd23838c5ec1ed73267826602b4100d7eaf4cc2d20ec2afeb18271706@group.calendar.google.com"
-const CALENDAR_URL = "https://calendar.google.com/calendar/embed?src="+CALENDAR_ID+"%40group.calendar.google.com&ctz=Europe%2FAthens"
+//const CALENDAR_URL = "https://calendar.google.com/calendar/embed?src="+CALENDAR_ID+"%40group.calendar.google.com&ctz=Europe%2FAthens"
+const CALENDAR_URL = "https://calendar.google.com/calendar/u/0?cid="+CALENDAR_ID+"%40group.calendar.google.com&ctz=Europe%2FAthens"

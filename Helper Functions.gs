@@ -96,11 +96,15 @@ function calendraEvent(_meetingName, _eventDestination, _eventLocation, _Date, _
     },
     transparency: "opaque",
     visibility: "default",
+    /*
     attendees: [
-      {
-        email: String(_guestEmail[0]),
-      }
-    ],
+      {email: String(_guestEmail[0])},
+      {email: String(_guestEmail[1])},
+      {email: String(_guestEmail[2])},
+      {email: String(_guestEmail[3])},
+      {email: String(_guestEmail[4])},
+    ].filter(attendees =>  attendees.email),
+    */
     //"attendeesOmitted": boolean,
     /*"extendedProperties": {
       "private": {
@@ -200,6 +204,18 @@ function calendraEvent(_meetingName, _eventDestination, _eventLocation, _Date, _
     //eventType: "default"
   }
   
+  if (_guestEmail.length > 0)
+  {
+    var attendeesArr = []
+
+    for (var i = 0; i < _guestEmail.length; i++)
+    {
+      attendeesArr.push({email:_guestEmail[i]})
+    }
+
+    event.attendees = attendeesArr//_guestEmail
+  }
+
   /*var newMeetingEvent = Calendar.Events.insert(event, CALENDAR_ID)
   var newMeetingEventID = newMeetingEvent.getId()
   
@@ -327,6 +343,25 @@ function replacePlaceholdersInNotes(_meetingName, _meetingNumber, _meetingDate, 
 
 //A function that creates a stylised link on a cell on a sheet.
 
+/**
+ * Links the contents of a cell in a Google Sheets spreadsheet to a specified URL
+ * with custom label and formatting.
+ *
+ * @param {string} label - The label text that will be displayed in the linked cell.
+ * @param {string} url - The URL to which the cell content will be linked.
+ * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet - The Google Sheets sheet containing the cell.
+ * @param {string} cell - The cell address (A1 notation) where the linked content will be placed.
+ * @returns {void}
+ *
+ * ```javascript
+ * // Example usage:
+ * var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+ * var label = "Visit Google";
+ * var url = "https://www.google.com";
+ * var cell = "A1";
+ * linkCellContents(label, url, sheet, cell);
+ * ```
+ */
 function linkCellContents(label,url,sheet,cell) 
 {
  var range = sheet.getRange(cell)
