@@ -1,6 +1,5 @@
 function newMeetingEssentials(runFrom)
 {
-  var ui = SpreadsheetApp.getUi()
   //var activeSheet = ActiveSpreadsheet.getActiveSheet()
   var activeSheet = ActiveSpreadsheet.getSheets()[0]
 
@@ -44,6 +43,8 @@ function newMeetingEssentials(runFrom)
 
   if (runFrom === "Menu")
   {
+    var ui = SpreadsheetApp.getUi()
+
     // Prompt for meeting date confirmation and possible date change.
       let meetingDateToConfirm = new Date(meetingDateYear, meetingDateMonth, meetingDateDate, START_TIME_HOURS, START_TIME_MINUTES,null,null)
       var alertResponse = showAlert(
