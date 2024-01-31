@@ -57,5 +57,5 @@ const EVENT_LOCATION = "📞 Google Meet"
   //Example: EVENT_GUESTS = ["board@esnsection.org"]
 
 // Calendar ID to create the Event
-const CALENDAR_ID = "c_899b9a4fd23838c5ec1ed73267826602b4100d7eaf4cc2d20ec2afeb18271706@group.calendar.google.com"
+const CALENDAR_ID = ""
 const CALENDAR_URL = "https://calendar.google.com/calendar/u/0?cid="+CALENDAR_ID+"%40group.calendar.google.com&ctz=Europe%2FAthens"
