@@ -6,6 +6,8 @@ const AGENDA_TEMPLATE_SHEET = SpreadsheetApp.getActiveSpreadsheet().getSheetByNa
 // Meetings Notes Google Document Template
 const NOTES_TEMPLATE_DOC_URL = "https://docs.google.com/document/d/1yZNtfD299o0RZ4EDJDsBYzwB3hXGOmHvdQ2TtJGThpw/edit"
 
+const DOCUMENTATION_URL = "https://docs.google.com/document/d/1lKIBvzzRSKa0mBPJoZYAi-dAaDVTO2xH4NJGr-bnxFA/edit?usp=sharing"
+
 
 // Cell Ranges
 const DAY_OF_THE_WEEK_CELL = "C3"

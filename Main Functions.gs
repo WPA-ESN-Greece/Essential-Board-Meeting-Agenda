@@ -1,6 +1,5 @@
 function newMeetingEssentials(runFrom)
 {
-  //var activeSheet = ActiveSpreadsheet.getActiveSheet()
   var activeSheet = ActiveSpreadsheet.getSheets()[0]
 
   let NOTES_TEMPLATE_DOC_ID = extractDocumentIdFromUrl(NOTES_TEMPLATE_DOC_URL)
