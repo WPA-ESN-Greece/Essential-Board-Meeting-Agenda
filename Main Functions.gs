@@ -1,9 +1,11 @@
 function newMeetingEssentials(runFrom)
 {
-  //var activeSheet = ActiveSpreadsheet.getActiveSheet()
   var activeSheet = ActiveSpreadsheet.getSheets()[0]
 
-  let NOTES_TEMPLATE_DOC_ID = extractDocumentIdFromUrl(NOTES_TEMPLATE_DOC_URL)
+  NOTES_TEMPLATE_DOC_ID = extractDocumentIdFromUrl(AGENDA_TEMPLATE_SHEET.getRange(MEETING_NOTES_LINK_CELL).getValue())  //extractDocumentIdFromUrl(NOTES_TEMPLATE_DOC_URL)
+  //let NOTES_TEMPLATE_DOC = DriveApp.getFileById(NOTES_TEMPLATE_DOC_ID)
+  
+  // Gets the Template ID from the cell C9 in "#No | Date" sheet. 
   let NOTES_TEMPLATE_DOC = DriveApp.getFileById(NOTES_TEMPLATE_DOC_ID)
 
   // Start Time
@@ -128,25 +130,30 @@ function newMeetingEssentials(runFrom)
   // Replaces placeholders with meeting information.
   replacePlaceholdersInNotes(meetingTitle, meetingNumber, meetingDate, meetingDateFormated, meetingAgendaURL, meetingNotesDoc, Utilities.formatDate(meetingStartTime, TIMEZONE, "HH:mm"), Utilities.formatDate(meetingEndTime, TIMEZONE, "HH:mm"), EVENT_LOCATION)
 
-  // Create Google Calendar Event Object.
-  let meetingEventObj = calendraEvent( meetingTitle, EVENT_DESCRIPTION, EVENT_LOCATION, meetingDate, meetingStartTime, meetingEndTime, meetingNumber, meetingAgendaURL, meetingNotesDocURL, EVENT_GUESTS)
-  // Create Google Calendar Event
-  let newMeetingEvent = Calendar.Events.insert( meetingEventObj, CALENDAR_ID, {
-   supportsAttachments: true,
-   conferenceDataVersion: 1
-   })
-  let newMeetingEventID = newMeetingEvent.getId()
-  
-  // Gets the meeting Google Meet URL.
-  meetingMeetURL = newMeetingEvent.hangoutLink
-  // Puts the Google Meet URL on the new Agenda.
-  linkCellContents('🔗 Google Meet link', meetingMeetURL, newAgendaSheet, MEETING_URL_CELL)
+  // If there is no calendar ID, the calendar features are ignored. 
+  Logger.log("CALENDAR_ID   " + CALENDAR_ID)
+  if (!(CALENDAR_ID == "" || CALENDAR_ID == 'Meeting Calendar ID here'))
+  {
+    // Create Google Calendar Event Object.
+    let meetingEventObj = calendraEvent( meetingTitle, EVENT_DESCRIPTION, EVENT_LOCATION, meetingDate, meetingStartTime, meetingEndTime, meetingNumber, meetingAgendaURL, meetingNotesDocURL, EVENT_GUESTS)
+    // Create Google Calendar Event
+    let newMeetingEvent = Calendar.Events.insert( meetingEventObj, CALENDAR_ID, {
+    supportsAttachments: true,
+    conferenceDataVersion: 1
+    })
+    
+    let newMeetingEventID = newMeetingEvent.getId()
+
+    // Gets the meeting Google Meet URL.
+    meetingMeetURL = newMeetingEvent.hangoutLink
+    // Puts the Google Meet URL on the new Agenda.
+    linkCellContents('🔗 Google Meet link', meetingMeetURL, newAgendaSheet, MEETING_URL_CELL)
+
+    linkCellContents('🔗 Meeting Calendar 📆', CALENDAR_URL, newAgendaSheet, MEETING_CALENDAR_LINK_CELL)
+  }
+
   // Puts the URL of the Note Folder.
   linkCellContents('🔗 Meeting Notes Folder 📂', DriveApp.getFolderById(notesFolderID).getUrl(), newAgendaSheet, MEETING_NOTES_FOLDER_LINK_CELL)
-  //linkCellContents('🔗 Meeting Notes Folder 📂', DriveApp.getFolderById(notesFolderID).getUrl(), AGENDA_TEMPLATE_SHEET, MEETING_NOTES_FOLDER_LINK_CELL)
-  //
-  linkCellContents('🔗 Meeting Calendar 📆', CALENDAR_URL, newAgendaSheet, MEETING_CALENDAR_LINK_CELL)
-  //linkCellContents('🔗 Meeting Calendar 📆', CALENDAR_URL, AGENDA_TEMPLATE_SHEET, MEETING_CALENDAR_LINK_CELL)
 
   // Transers postponed topics to from last meeting to the newest one's agenda.
   SpreadsheetApp.flush()
@@ -169,8 +176,7 @@ function newMeetingEssentials(runFrom)
       newstAgendaSheet.insertRowBefore(13)
 
       newstAgendaSheet.getRange(13,1,1, newstAgendaSheet.getLastColumn()).setValues([row])
-      
-      //Logger.log(row)
+    
     }
   })
 }
@@ -183,4 +189,77 @@ function timeTriggered()
     newMeetingEssentials("trigger")
   }
   else {return}
+}
+
+//Authentication Window
+function authPopUp()
+{
+  var ui = SpreadsheetApp.getUi()
+
+  var authInfo = ScriptApp.getAuthorizationInfo(ScriptApp.AuthMode.FULL)
+  let authStatus = authInfo.getAuthorizationStatus()
+
+  Logger.log("authStatus " + authStatus)
+
+  if (authStatus === ScriptApp.AuthorizationStatus.REQUIRED)
+  {
+    var authUrl = authInfo.getAuthorizationUrl()
+    
+    var message = HtmlService.createHtmlOutput(`<p style="font-family: 'Open Sans'">Authenticate your script.<a href="${authUrl}" target="_blank">here</a></p>`).setWidth(400).setHeight(60)
+    ui.showModalDialog(message,"Authentication")
+
+  }
+}
+
+function initialSetup()
+{
+  var ui = SpreadsheetApp.getUi()
+
+  if (AGENDA_TEMPLATE_SHEET.getRange('C1').getValue() != 'Needs set-up') 
+  {
+    showAlert(`Set-Up Completed ✨`,
+    `The set-up was completed. Now you should reload your spreadsheet.`,
+    ui.ButtonSet.OK
+    )
+    
+    return
+  }
+
+  authPopUp()
+
+  NOTES_TEMPLATE_DOC_ID = extractDocumentIdFromUrl(NOTES_TEMPLATE_DOC_URL)
+
+  // Create a copy of the Meeting Notes' template in the agendas parent folder.  
+  let parentFolderID = DriveApp.getFileById(ss.getId()).getParents().next().getId()
+  
+  // Prompt for creating a meeting notes template in the users Google Drive instead of using the one in ESN Greecce Google Drive. . 
+  var alertResponse = showAlert(
+    "📝 Meeting Notes' Template",
+    `You are about to create a meeting agenda using the Meeting Note's template from ESN Greece Google Drive. Do you wish to continue? 
+    
+    By clicking 'No' a Template will be created in your Google Drive and be linked to this Agenda for future use.
+    
+    For one-time meetings it is advised to click 'YES'.
+    `, 
+    ui.ButtonSet.YES_NO)
+  
+  // This will run if the user clicks on 'NO' and create a copy of the Meeting Notes Template in the user's Googlse Drive in the same folder as the current Agenda. 
+  if (alertResponse === ui.Button.NO)
+  {
+    let meetingNotesDocTemplate = DriveApp.getFileById(NOTES_TEMPLATE_DOC_ID).makeCopy(`Meeting Notes - Template`, DriveApp.getFolderById(parentFolderID))
+
+    AGENDA_TEMPLATE_SHEET.getRange(MEETING_NOTES_LINK_CELL).setValue(meetingNotesDocTemplate.getUrl()).setWrap(true)
+  }
+  // This will run if the user clicks on 'YES' and pastes the URL of the original Meeting Notes Template in the cell C9 of the template sheet. 
+  if (alertResponse === ui.Button.YES)
+  {
+    AGENDA_TEMPLATE_SHEET.getRange(MEETING_NOTES_LINK_CELL).setValue(NOTES_TEMPLATE_DOC_URL).setWrap(true)
+  }
+
+  // Set up trigger for Time-driven Meeting Generation of Meetings. 
+  ScriptApp.newTrigger('timeTriggered').timeBased().everyWeeks(1).onWeekDay(getWeekDayForTrigger()).atHour(17).create()
+
+  AGENDA_TEMPLATE_SHEET.getRange('C1').setValue('')
+  
+  SpreadsheetApp.flush()
 }

@@ -213,33 +213,30 @@ function calendraEvent(_meetingName, _eventDestination, _eventLocation, _Date, _
       attendeesArr.push({email:_guestEmail[i]})
     }
 
-    event.attendees = attendeesArr//_guestEmail
+    event.attendees = attendeesArr
   }
-
-  /*var newMeetingEvent = Calendar.Events.insert(event, CALENDAR_ID)
-  var newMeetingEventID = newMeetingEvent.getId()
-  
- var eventDetails = {
-  id: newMeetingEvent.getId(),
-  googleMeetURL: newMeetingEvent.hangoutLink
- }*/
 
   return event
 }
 
 
-//Create new folder function while it checks if it already exists.
-function createNewFolder(parentFolderID, newFolderName){
+// Create new folder function while it checks if it already exists.
+function createNewFolder(parentFolderID, newFolderName)
+{
   
-  //var parentFolderID = parentFolder.getId()
   var folder = DriveApp.getFolderById(parentFolderID).getFolders()
 
-  while(folder.hasNext()) {
+  while(folder.hasNext()) 
+  {
     var folderN = folder.next()
-    if(folderN.getName() == newFolderName){
-      return folderN }
+
+    if(folderN.getName() == newFolderName)
+    {
+      return folderN 
+    }
   }
   var destinationFolder = DriveApp.getFolderById(parentFolderID).createFolder(newFolderName)
+  
   return destinationFolder
 }
 
@@ -247,18 +244,36 @@ function createNewFolder(parentFolderID, newFolderName){
 
 //Day of the week function. Returns a numeric value that coresponds to a days of the week.
 
-function dayOfTheWeek(string) {
-  if(string === 'Monday') return 1
-  if(string === 'Tuesday') return 2
-  if(string === 'Wednesday') return 3
-  if(string === 'Thursday') return 4
-  if(string === 'Friday') return 5
-  if(string === 'Saturday') return 6
-  if(string === 'Sunday') return 0
+function dayOfTheWeek(string) 
+{
+
+  switch (string)
+  {
+    case "Monday":
+      return 1
+
+    case "Tuesday":
+      return 2
+
+    case "Wednesday":
+      return 3
+
+    case "Thursday":
+      return 4      
+
+    case "Friday":
+      return 5    
+
+    case "Saturday":
+      return 6    
+
+    case "Sunday":
+      return 0 
+  }
 }
 
 
-//A function that calculates the next day of the week. In this case, day = Tuesday.
+// A function that calculates the next day of the week. In this case, day = Tuesday.
 function nextDay(date, day) {
 
   const result = new Date()//date.getTime()
@@ -365,6 +380,7 @@ function replacePlaceholdersInNotes(_meetingName, _meetingNumber, _meetingDate, 
 function linkCellContents(label,url,sheet,cell) 
 {
  var range = sheet.getRange(cell)
+ 
  var style = SpreadsheetApp.newTextStyle()
       .setItalic(false)
       .setBold(true)
@@ -373,6 +389,7 @@ function linkCellContents(label,url,sheet,cell)
       .setForegroundColor('#1155cc')
       .setUnderline(true)
       .build()
+ 
  var richValue = SpreadsheetApp.newRichTextValue()
  .setText(label)
  .setLinkUrl(url)
@@ -459,4 +476,37 @@ function isDateValid(datetimeString)
     Logger.log(outputObj)
     return outputObj
   }
+}
+
+
+
+function getWeekDayForTrigger()
+{
+  let weekDayToTrigger = 0
+  let weekDayNumber = dayOfTheWeek(DAY_OF_THE_WEEK)
+
+  if (weekDayNumber >= 0 && weekDayNumber < 6)
+  {
+    weekDayToTrigger = weekDayNumber + 1
+  }
+  else {weekDayToTrigger = 0}
+  
+  switch (weekDayToTrigger)
+  {
+    case 1:
+      return ScriptApp.WeekDay.MONDAY
+    case 2:
+      return ScriptApp.WeekDay.TUESDAY
+    case 3:
+      return ScriptApp.WeekDay.WEDNESDAY
+    case 4:
+      return ScriptApp.WeekDay.THURSDAY      
+    case 5:
+      return ScriptApp.WeekDay.FRIDAY    
+    case 6:
+      return ScriptApp.WeekDay.SATURDAY      
+    case 0:
+      return ScriptApp.WeekDay.SUNDAY    
+  }
+
 }
