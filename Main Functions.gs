@@ -129,7 +129,7 @@ function newMeetingEssentials(runFrom)
   replacePlaceholdersInNotes(meetingTitle, meetingNumber, meetingDate, meetingDateFormated, meetingAgendaURL, meetingNotesDoc, Utilities.formatDate(meetingStartTime, TIMEZONE, "HH:mm"), Utilities.formatDate(meetingEndTime, TIMEZONE, "HH:mm"), EVENT_LOCATION)
 
   // If there is no calendar ID, the calendar features are ignored. 
-  if (!(CALENDAR_ID == "" || CALENDAR_ID == 'Meeting Calendar ID here'))
+  if (!(CALENDAR_ID == "" || CALENDAR_ID == CALENDAR_ID_TEXT))
   {
     // Create Google Calendar Event Object.
     let meetingEventObj = calendraEvent( meetingTitle, EVENT_DESCRIPTION, EVENT_LOCATION, meetingDate, meetingStartTime, meetingEndTime, meetingNumber, meetingAgendaURL, meetingNotesDocURL, EVENT_GUESTS)
