@@ -42,11 +42,13 @@ let MEETIING_NAME = ActiveSpreadsheet.getName().split(" |",1)
 
   // Start Time
   let START_TIME = AGENDA_TEMPLATE_SHEET.getRange(START_TIME_CELL).getValue()
+
     let START_TIME_HOURS = START_TIME.split(":",1)
     let START_TIME_MINUTES = START_TIME.split(":",2).slice(1,2)
 
   // End Time
   let END_TIME = AGENDA_TEMPLATE_SHEET.getRange(END_TIME_CELL).getValue()
+
     let END_TIME_HOURS = END_TIME.split(":",1)
     let END_TIME_MINUTES = END_TIME.split(":",2).slice(1,2)
 
