@@ -16,6 +16,7 @@ const MEETING_CALENDAR_LINK_CELL = "G4"
 const MEETING_GUESTS_CELL = "C10"
 const TIME_DRIVEN_GENERATION_CELL = "C2"
 const NEED_SETUP_CELL = "C1"
+const NEED_SETUP_TEXT = "Needs set-up"
 const TIME_DRIVEN_GENERATION_TEXT = "Time-driven Meeting Generation"
 const MEET_URL_DEFAULT = "This will generate for every meeting."
 

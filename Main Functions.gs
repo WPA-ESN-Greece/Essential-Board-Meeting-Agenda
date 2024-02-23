@@ -215,7 +215,7 @@ function initialSetup()
   var ui = SpreadsheetApp.getUi()
 
   // Checks if the set-up is complete. 
-  if (AGENDA_TEMPLATE_SHEET.getRange(NEED_SETUP_CELL).getValue() != 'Needs set-up') 
+  if (AGENDA_TEMPLATE_SHEET.getRange(NEED_SETUP_CELL).getValue() != NEED_SETUP_TEXT) 
   {
     showAlert(`Set-Up Completed ✨`,
     `The set-up was completed. Now you should reload your spreadsheet.`,
