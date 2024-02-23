@@ -1,5 +1,4 @@
 // Gets the ID of a google doc file (Doc, spredsheet, presentation, form), folder or script from its URL.
-
 function extractDocumentIdFromUrl(url) 
 {
   var parts = url.split('/')
@@ -7,11 +6,9 @@ function extractDocumentIdFromUrl(url)
   if (parts[4] == "d")
   {
     var idIndex = parts.indexOf('d') + 1
-    //Logger.log(parts = url.split('/'))
 
     if (idIndex > 0 && idIndex < parts.length) 
     {
-      //Logger.log(parts[idIndex])
       return parts[idIndex]
     } 
     else 
@@ -29,7 +26,6 @@ function extractDocumentIdFromUrl(url)
 
     if (idIndex > 0 && idIndex < parts.length) 
     {
-      //Logger.log(parts[idIndex])
       return parts[idIndex]
     }
     else 
@@ -49,15 +45,14 @@ function extractDocumentIdFromUrl(url)
 
 
 // Creates a Google Callendar Event object
-
 function calendraEvent(_meetingName, _eventDestination, _eventLocation, _Date, _startTime, _endTime, _meetingNumber, _meetingAgendaUrl, _meetingNotesUrl, _guestEmail)
 {
   // Google Calenda API Event Object: https://developers.google.com/calendar/api/v3/reference/events
 
-  var eventStartTimeNdate = new Date(_Date.getFullYear(), _Date.getMonth(), _Date.getDate(), _startTime.getHours(), _startTime.getMinutes())
-  var eventEndTimeNdate = new Date(_Date.getFullYear(), _Date.getMonth(), _Date.getDate(), _endTime.getHours(), _endTime.getMinutes())
+  let eventStartTimeNdate = new Date(_Date.getFullYear(), _Date.getMonth(), _Date.getDate(), _startTime.getHours(), _startTime.getMinutes())
+  let eventEndTimeNdate = new Date(_Date.getFullYear(), _Date.getMonth(), _Date.getDate(), _endTime.getHours(), _endTime.getMinutes())
 
-  //Google Calendar Event Object
+  //Google Calendar Event Object and all of its properties. The commented ones are not in use. 
   let event = {
     //kind: "calendar#event",
     //"etag": etag,
@@ -115,17 +110,17 @@ function calendraEvent(_meetingName, _eventDestination, _eventLocation, _Date, _
       }
     },*/
     //hangoutLink: string,
-    conferenceData: {
+    //conferenceData: {
       //conferenceDataVersion: 1,//
-      createRequest: {
-        requestId: "meet"+_meetingNumber,
-        conferenceSolutionKey: {
-          type: "hangoutsMeet"
-        },
+      //createRequest: {
+        //requestId: "meet"+_meetingNumber,
+        //conferenceSolutionKey: {
+          //type: "hangoutsMeet"
+        //},
         /*"status": {
           "statusCode": string
         }*/
-      },
+      //},
       /*entryPoints: [
         {
           entryPointType: "video",
@@ -148,7 +143,7 @@ function calendraEvent(_meetingName, _eventDestination, _eventLocation, _Date, _
       //"conferenceId": string,
       //"signature": string,
       //"notes": string,
-    },
+    //},
     //"anyoneCanAddSelf": boolean,
     //sendInvites: true,//
     guestsCanInviteOthers: true,
@@ -204,61 +199,102 @@ function calendraEvent(_meetingName, _eventDestination, _eventLocation, _Date, _
     //eventType: "default"
   }
   
-  if (_guestEmail.length > 0)
+  // Adds every comma-seperated email address found in cell 'C10' (Meeting Guests) in the Template Sheet.
+  if (_guestEmail.length > 0 && _guestEmail != "")
   {
-    var attendeesArr = []
+    let attendeesArr = []
 
     for (var i = 0; i < _guestEmail.length; i++)
     {
-      attendeesArr.push({email:_guestEmail[i]})
+      let emailAddressFormated = _guestEmail[i].trimStart()
+      emailAddressFormated = _guestEmail[i].trim()
+      
+      attendeesArr.push({email:emailAddressFormated})
     }
 
-    event.attendees = attendeesArr//_guestEmail
+    event.attendees = attendeesArr
   }
-
-  /*var newMeetingEvent = Calendar.Events.insert(event, CALENDAR_ID)
-  var newMeetingEventID = newMeetingEvent.getId()
   
- var eventDetails = {
-  id: newMeetingEvent.getId(),
-  googleMeetURL: newMeetingEvent.hangoutLink
- }*/
+  // Gets the Meeting URL value foind in the Template Sheet. 
+  let meetingURLinTemplate = AGENDA_TEMPLATE_SHEET.getRange(MEETING_URL_CELL).getValue()
+  
+  // Runs only if the the Meet URL Cell in the Template Sheet matches the text in 'MEET_URL_DEFAULT' found in the config.
+  if (meetingURLinTemplate == MEET_URL_DEFAULT)
+  {
+    event.conferenceData = {
+        //conferenceDataVersion: 1,
+        createRequest: {
+          requestId: "meet"+_meetingNumber,
+          conferenceSolutionKey: {type: "hangoutsMeet"}
+        }
+      }
+  }
+  // Runs only if the the Meet URL Cell in the Template Sheet does NOT matche the text in 'MEET_URL_DEFAULT' found in the config AND is not empty. 
+  else if (meetingURLinTemplate != "" && meetingURLinTemplate != MEET_URL_DEFAULT)
+  {
+    // Adds the user entered fixed meeting URL in the Events description. 
+    event.description += `
+
+    Meeting Link: ${meetingURLinTemplate}`
+  }
 
   return event
 }
 
 
-//Create new folder function while it checks if it already exists.
-function createNewFolder(parentFolderID, newFolderName){
+// Create new folder function while it checks if it already exists.
+function createNewFolder(parentFolderID, newFolderName)
+{
   
-  //var parentFolderID = parentFolder.getId()
   var folder = DriveApp.getFolderById(parentFolderID).getFolders()
 
-  while(folder.hasNext()) {
+  while(folder.hasNext()) 
+  {
     var folderN = folder.next()
-    if(folderN.getName() == newFolderName){
-      return folderN }
+
+    if(folderN.getName() == newFolderName)
+    {
+      return folderN 
+    }
   }
   var destinationFolder = DriveApp.getFolderById(parentFolderID).createFolder(newFolderName)
+  
   return destinationFolder
 }
 
 
 
 //Day of the week function. Returns a numeric value that coresponds to a days of the week.
+function dayOfTheWeek(string) 
+{
 
-function dayOfTheWeek(string) {
-  if(string === 'Monday') return 1
-  if(string === 'Tuesday') return 2
-  if(string === 'Wednesday') return 3
-  if(string === 'Thursday') return 4
-  if(string === 'Friday') return 5
-  if(string === 'Saturday') return 6
-  if(string === 'Sunday') return 0
+  switch (string)
+  {
+    case "Monday":
+      return 1
+
+    case "Tuesday":
+      return 2
+
+    case "Wednesday":
+      return 3
+
+    case "Thursday":
+      return 4      
+
+    case "Friday":
+      return 5    
+
+    case "Saturday":
+      return 6    
+
+    case "Sunday":
+      return 0 
+  }
 }
 
 
-//A function that calculates the next day of the week. In this case, day = Tuesday.
+// A function that calculates the next day of the week. In this case, day = Tuesday.
 function nextDay(date, day) {
 
   const result = new Date()//date.getTime()
@@ -270,7 +306,7 @@ function nextDay(date, day) {
   var month = result.getMonth()
   var year = result.getFullYear()
 
-  var resultFormated = new Date(year,month,dayr,null,null,null,null) //Utilities.formatDate(result,'GMT+2','d/M/YYYY')
+  var resultFormated = new Date(year,month,dayr,null,null,null,null) 
 
   return resultFormated
 }
@@ -280,8 +316,6 @@ function nextDay(date, day) {
 
 function newMeetingDate(currentSheetDate = new Date("09/09/23"), _meetingNumber = 1) 
 {
-  
-  
   var finalMeetingDate = Date()
   var currentDate = new Date()
   
@@ -292,14 +326,13 @@ function newMeetingDate(currentSheetDate = new Date("09/09/23"), _meetingNumber 
 
   currentDate = new Date( currentDateYear, currentDateMonth, currentDateDate, null, null, null, null)
 
-  // 
   var DAY_OF_THE_WEEK = String(AGENDA_TEMPLATE_SHEET.getRange(DAY_OF_THE_WEEK_CELL).getValue())
   var weekDay = dayOfTheWeek(DAY_OF_THE_WEEK)
 
-  //Calculates date of the next day of the week given. Example: If day of the week is Tuesday, it will calculate the next Tuesday date.
+  // Calculates date of the next day of the week given. Example: If day of the week is Tuesday, it will calculate the next Tuesday date.
    var nextMeetingDate = new Date(nextDay(currentDate, weekDay))
 
-  //NewMeetingDate details
+  // NewMeetingDate details
     var nextMeetingDateDate = nextMeetingDate.getDate()
     var nextMeetingDateMonth = nextMeetingDate.getMonth()
     var nextMeetingDateYear = nextMeetingDate.getFullYear()
@@ -365,6 +398,7 @@ function replacePlaceholdersInNotes(_meetingName, _meetingNumber, _meetingDate, 
 function linkCellContents(label,url,sheet,cell) 
 {
  var range = sheet.getRange(cell)
+ 
  var style = SpreadsheetApp.newTextStyle()
       .setItalic(false)
       .setBold(true)
@@ -373,6 +407,7 @@ function linkCellContents(label,url,sheet,cell)
       .setForegroundColor('#1155cc')
       .setUnderline(true)
       .build()
+ 
  var richValue = SpreadsheetApp.newRichTextValue()
  .setText(label)
  .setLinkUrl(url)
@@ -412,40 +447,49 @@ function isDateValid(datetimeString)
   // Date format dd/MM/yyyy
   const expectedDateRegEx = /^\d{2}\/\d{2}\/\d{4}, \d{2}:\d{2}-\d{2}:\d{2}$/
   const Demo_datetimeString = "15/09/2023, 15:30-17:00"
+  
   if (datetimeString.length < Demo_datetimeString.length) {return {status: false}}
   
-  var date = String(datetimeString).split(", ")[0]
-  var timeStart = String(datetimeString).split(", ")[1].split("-")[0]
-  var timeEnd = String(datetimeString).split(", ")[1].split("-")[1]
+  let date = String(datetimeString).split(", ")[0]
+  let timeStart = String(datetimeString).split(", ")[1].split("-")[0]
+  let timeEnd = String(datetimeString).split(", ")[1].split("-")[1]
 
   // Test the input string against the pattern
-  var match = datetimeString.match(expectedDateRegEx);
+  let match = datetimeString.match(expectedDateRegEx)
 
-  if (!match) {
+  Logger.log(`-------- date regex match: ${match} `)
+
+  if (!match) 
+  {
     Logger.log(`The string '${datetimeString}' format doesn't match "dd/MM/yyyy, HH:mm-HH:mm"`)
     return outputObj = {status: false}; // The string format doesn't match "dd/MM/yyyy"
   }
   
   Logger.log("date " + date)
+
   var dateInQuestion = new Date(date.split("/")[2], date.split("/")[1] - 1, date.split("/")[0], null,null,null,null)
+  
   Logger.log("dateInQuestion " + dateInQuestion)
+  
   var day = dateInQuestion.getDate()
-  var month = dateInQuestion.getMonth()
+  var month = dateInQuestion.getMonth() +1
   var year = dateInQuestion.getFullYear()
+
+  Logger.log(`Day: ${day}, Month: ${month}, Year: ${year}`)
 
   // Check if the extracted day and month are within valid ranges
   if (day < 1 || day > 31 || month < 1 || month > 12) {
     Logger.log("Day or month is out of range.")
     return outputObj = {status: false} // Day or month is out of range
   }
-  else if ((year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0) === false && month === 2 && day > 28) 
+  else if (((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0) == false) && (month == 2 && day > 28)) 
   {
     Logger.log("Febuary has more than 28 days in a non-leap year.")
     return outputObj = {status: false}
   }
-  else if (((year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0) === true && month === 2 && day > 29) || ([4, 6, 9, 11].includes(month) === true && day > 30)) 
+  else if (((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) && ((month == 2 && day > 29) || ([4, 6, 9, 11].includes(month) && day > 30))) 
   {
-    Logger.log("Febuary has more than 29 days in a leap year OR a 20 day month has mpre than 30 days.")
+    Logger.log("Febuary has more than 29 days in a leap year OR a 20 day month has more than 30 days.")
     return outputObj = {status: false}
   }
   else 
@@ -453,10 +497,45 @@ function isDateValid(datetimeString)
     Logger.log("Valid Date.")
     outputObj = {
       status: true, 
-      startDate: new Date(year, month, day, timeStart.split(":")[0], timeStart.split(":")[1], null, null),
-      endDate: new Date(year, month, day, timeEnd.split(":")[0], timeEnd.split(":")[1], null, null)
+      startDate: new Date(year, month -1, day, timeStart.split(":")[0], timeStart.split(":")[1], null, null),
+      endDate: new Date(year, month -1, day, timeEnd.split(":")[0], timeEnd.split(":")[1], null, null)
       }
+    
     Logger.log(outputObj)
+
     return outputObj
   }
+}
+
+
+
+function getWeekDayForTrigger()
+{
+  let weekDayToTrigger = 0
+  let weekDayNumber = dayOfTheWeek(DAY_OF_THE_WEEK)
+
+  if (weekDayNumber >= 0 && weekDayNumber < 6)
+  {
+    weekDayToTrigger = weekDayNumber + 1
+  }
+  else {weekDayToTrigger = 0}
+  
+  switch (weekDayToTrigger)
+  {
+    case 1:
+      return ScriptApp.WeekDay.MONDAY
+    case 2:
+      return ScriptApp.WeekDay.TUESDAY
+    case 3:
+      return ScriptApp.WeekDay.WEDNESDAY
+    case 4:
+      return ScriptApp.WeekDay.THURSDAY      
+    case 5:
+      return ScriptApp.WeekDay.FRIDAY    
+    case 6:
+      return ScriptApp.WeekDay.SATURDAY      
+    case 0:
+      return ScriptApp.WeekDay.SUNDAY    
+  }
+
 }
