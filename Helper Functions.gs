@@ -265,7 +265,6 @@ function createNewFolder(parentFolderID, newFolderName)
 
 
 //Day of the week function. Returns a numeric value that coresponds to a days of the week.
-
 function dayOfTheWeek(string) 
 {
 
@@ -307,7 +306,7 @@ function nextDay(date, day) {
   var month = result.getMonth()
   var year = result.getFullYear()
 
-  var resultFormated = new Date(year,month,dayr,null,null,null,null) //Utilities.formatDate(result,'GMT+2','d/M/YYYY')
+  var resultFormated = new Date(year,month,dayr,null,null,null,null) 
 
   return resultFormated
 }
@@ -317,8 +316,6 @@ function nextDay(date, day) {
 
 function newMeetingDate(currentSheetDate = new Date("09/09/23"), _meetingNumber = 1) 
 {
-  
-  
   var finalMeetingDate = Date()
   var currentDate = new Date()
   
@@ -329,14 +326,13 @@ function newMeetingDate(currentSheetDate = new Date("09/09/23"), _meetingNumber 
 
   currentDate = new Date( currentDateYear, currentDateMonth, currentDateDate, null, null, null, null)
 
-  // 
   var DAY_OF_THE_WEEK = String(AGENDA_TEMPLATE_SHEET.getRange(DAY_OF_THE_WEEK_CELL).getValue())
   var weekDay = dayOfTheWeek(DAY_OF_THE_WEEK)
 
-  //Calculates date of the next day of the week given. Example: If day of the week is Tuesday, it will calculate the next Tuesday date.
+  // Calculates date of the next day of the week given. Example: If day of the week is Tuesday, it will calculate the next Tuesday date.
    var nextMeetingDate = new Date(nextDay(currentDate, weekDay))
 
-  //NewMeetingDate details
+  // NewMeetingDate details
     var nextMeetingDateDate = nextMeetingDate.getDate()
     var nextMeetingDateMonth = nextMeetingDate.getMonth()
     var nextMeetingDateYear = nextMeetingDate.getFullYear()
@@ -448,8 +444,6 @@ function showAlert(title, message, buttonsOptions)
 
 function isDateValid(datetimeString)
 {
-  var datetimeString = "25/02/2024, 15:30-17:00"
-
   // Date format dd/MM/yyyy
   const expectedDateRegEx = /^\d{2}\/\d{2}\/\d{4}, \d{2}:\d{2}-\d{2}:\d{2}$/
   const Demo_datetimeString = "15/09/2023, 15:30-17:00"
@@ -483,12 +477,6 @@ function isDateValid(datetimeString)
 
   Logger.log(`Day: ${day}, Month: ${month}, Year: ${year}`)
 
-  // (((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0) == true && (month == 2 && day > 29)) || ([4, 6, 9, 11].includes(month) == true && day > 30)) 
-    // ((true || false) && false) || ([4, 6, 9, 11].includes(month) && day > 30)) 
-  Logger.log("========")
-  Logger.log(((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) && ((month == 2 && day > 29) || ([4, 6, 9, 11].includes(month) && day > 30)))
-  Logger.log("========")
-
   // Check if the extracted day and month are within valid ranges
   if (day < 1 || day > 31 || month < 1 || month > 12) {
     Logger.log("Day or month is out of range.")
@@ -512,7 +500,9 @@ function isDateValid(datetimeString)
       startDate: new Date(year, month -1, day, timeStart.split(":")[0], timeStart.split(":")[1], null, null),
       endDate: new Date(year, month -1, day, timeEnd.split(":")[0], timeEnd.split(":")[1], null, null)
       }
+    
     Logger.log(outputObj)
+
     return outputObj
   }
 }
