@@ -2,8 +2,7 @@ function newMeetingEssentials(runFrom)
 {
   var activeSheet = ActiveSpreadsheet.getSheets()[0]
 
-  NOTES_TEMPLATE_DOC_ID = extractDocumentIdFromUrl(AGENDA_TEMPLATE_SHEET.getRange(MEETING_NOTES_LINK_CELL).getValue())  //extractDocumentIdFromUrl(NOTES_TEMPLATE_DOC_URL)
-  //let NOTES_TEMPLATE_DOC = DriveApp.getFileById(NOTES_TEMPLATE_DOC_ID)
+  NOTES_TEMPLATE_DOC_ID = extractDocumentIdFromUrl(AGENDA_TEMPLATE_SHEET.getRange(MEETING_NOTES_LINK_CELL).getValue()) 
   
   // Gets the Template ID from the cell C9 in "#No | Date" sheet. 
   let NOTES_TEMPLATE_DOC = DriveApp.getFileById(NOTES_TEMPLATE_DOC_ID)

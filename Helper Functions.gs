@@ -429,43 +429,60 @@ function showAlert(title, message, buttonsOptions)
 
 function isDateValid(datetimeString)
 {
+  var datetimeString = "25/02/2024, 15:30-17:00"
+
   // Date format dd/MM/yyyy
   const expectedDateRegEx = /^\d{2}\/\d{2}\/\d{4}, \d{2}:\d{2}-\d{2}:\d{2}$/
   const Demo_datetimeString = "15/09/2023, 15:30-17:00"
+  
   if (datetimeString.length < Demo_datetimeString.length) {return {status: false}}
   
-  var date = String(datetimeString).split(", ")[0]
-  var timeStart = String(datetimeString).split(", ")[1].split("-")[0]
-  var timeEnd = String(datetimeString).split(", ")[1].split("-")[1]
+  let date = String(datetimeString).split(", ")[0]
+  let timeStart = String(datetimeString).split(", ")[1].split("-")[0]
+  let timeEnd = String(datetimeString).split(", ")[1].split("-")[1]
 
   // Test the input string against the pattern
-  var match = datetimeString.match(expectedDateRegEx);
+  let match = datetimeString.match(expectedDateRegEx)
 
-  if (!match) {
+  Logger.log(`-------- date regex match: ${match} `)
+
+  if (!match) 
+  {
     Logger.log(`The string '${datetimeString}' format doesn't match "dd/MM/yyyy, HH:mm-HH:mm"`)
     return outputObj = {status: false}; // The string format doesn't match "dd/MM/yyyy"
   }
   
   Logger.log("date " + date)
+
   var dateInQuestion = new Date(date.split("/")[2], date.split("/")[1] - 1, date.split("/")[0], null,null,null,null)
+  
   Logger.log("dateInQuestion " + dateInQuestion)
+  
   var day = dateInQuestion.getDate()
-  var month = dateInQuestion.getMonth()
+  var month = dateInQuestion.getMonth() +1
   var year = dateInQuestion.getFullYear()
+
+  Logger.log(`Day: ${day}, Month: ${month}, Year: ${year}`)
+
+  // (((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0) == true && (month == 2 && day > 29)) || ([4, 6, 9, 11].includes(month) == true && day > 30)) 
+    // ((true || false) && false) || ([4, 6, 9, 11].includes(month) && day > 30)) 
+  Logger.log("========")
+  Logger.log(((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) && ((month == 2 && day > 29) || ([4, 6, 9, 11].includes(month) && day > 30)))
+  Logger.log("========")
 
   // Check if the extracted day and month are within valid ranges
   if (day < 1 || day > 31 || month < 1 || month > 12) {
     Logger.log("Day or month is out of range.")
     return outputObj = {status: false} // Day or month is out of range
   }
-  else if ((year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0) === false && month === 2 && day > 28) 
+  else if (((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0) == false) && (month == 2 && day > 28)) 
   {
     Logger.log("Febuary has more than 28 days in a non-leap year.")
     return outputObj = {status: false}
   }
-  else if (((year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0) === true && month === 2 && day > 29) || ([4, 6, 9, 11].includes(month) === true && day > 30)) 
+  else if (((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) && ((month == 2 && day > 29) || ([4, 6, 9, 11].includes(month) && day > 30))) 
   {
-    Logger.log("Febuary has more than 29 days in a leap year OR a 20 day month has mpre than 30 days.")
+    Logger.log("Febuary has more than 29 days in a leap year OR a 20 day month has more than 30 days.")
     return outputObj = {status: false}
   }
   else 
@@ -473,8 +490,8 @@ function isDateValid(datetimeString)
     Logger.log("Valid Date.")
     outputObj = {
       status: true, 
-      startDate: new Date(year, month, day, timeStart.split(":")[0], timeStart.split(":")[1], null, null),
-      endDate: new Date(year, month, day, timeEnd.split(":")[0], timeEnd.split(":")[1], null, null)
+      startDate: new Date(year, month -1, day, timeStart.split(":")[0], timeStart.split(":")[1], null, null),
+      endDate: new Date(year, month -1, day, timeEnd.split(":")[0], timeEnd.split(":")[1], null, null)
       }
     Logger.log(outputObj)
     return outputObj
