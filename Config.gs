@@ -14,6 +14,9 @@ const MEETING_NOTES_LINK_CELL = "C9"
 const MEETING_NOTES_FOLDER_LINK_CELL = "G3"
 const MEETING_CALENDAR_LINK_CELL = "G4"
 const MEETING_GUESTS_CELL = "C10"
+const TIME_DRIVEN_GENERATION_CELL = "C2"
+const NEED_SETUP_CELL = "C1"
+const TIME_DRIVEN_GENERATION_TEXT = "Time-driven Meeting Generation"
 
 // Meetings Notes Google Document Template
 const NOTES_TEMPLATE_DOC_URL = "https://docs.google.com/document/d/1yZNtfD299o0RZ4EDJDsBYzwB3hXGOmHvdQ2TtJGThpw/edit" // The one in ESN Greece's Google Drive. 
@@ -28,19 +31,19 @@ let DAY_OF_THE_WEEK = String(AGENDA_TEMPLATE_SHEET.getRange(DAY_OF_THE_WEEK_CELL
 
 
 // If this is "Time-driven Meeting Generation" the timeTriggered function will generate meeting essentials.
-let Time_Driven_Meeting_Generation = AGENDA_TEMPLATE_SHEET.getRange("C2").getValue()
+let Time_Driven_Meeting_Generation = AGENDA_TEMPLATE_SHEET.getRange(TIME_DRIVEN_GENERATION_CELL).getValue()
 
 
 // Meetings Event Details
 let MEETIING_NAME = ActiveSpreadsheet.getName().split(" |",1)
 
   // Start Time
-  let START_TIME = AGENDA_TEMPLATE_SHEET.getRange("C5").getValue()
+  let START_TIME = AGENDA_TEMPLATE_SHEET.getRange(START_TIME_CELL).getValue()
     let START_TIME_HOURS = START_TIME.split(":",1)
     let START_TIME_MINUTES = START_TIME.split(":",2).slice(1,2)
 
   // End Time
-  let END_TIME = AGENDA_TEMPLATE_SHEET.getRange("C6").getValue()
+  let END_TIME = AGENDA_TEMPLATE_SHEET.getRange(END_TIME_CELL).getValue()
     let END_TIME_HOURS = END_TIME.split(":",1)
     let END_TIME_MINUTES = END_TIME.split(":",2).slice(1,2)
 
@@ -58,5 +61,5 @@ const EVENT_LOCATION = "📞 Google Meet"
     // Example: EVENT_GUESTS = ["board@esnsection.org"] 
 
 // Calendar ID to create the Event. 
-const CALENDAR_ID = AGENDA_TEMPLATE_SHEET.getRange('G4').getValue()
+const CALENDAR_ID = AGENDA_TEMPLATE_SHEET.getRange(MEETING_CALENDAR_LINK_CELL).getValue()
 const CALENDAR_URL = "https://calendar.google.com/calendar/u/0?cid="+CALENDAR_ID+"%40group.calendar.google.com&ctz=Europe%2FAthens"

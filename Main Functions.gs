@@ -215,7 +215,7 @@ function initialSetup()
   var ui = SpreadsheetApp.getUi()
 
   // Checks if the set-up is complete. 
-  if (AGENDA_TEMPLATE_SHEET.getRange('C1').getValue() != 'Needs set-up') 
+  if (AGENDA_TEMPLATE_SHEET.getRange(NEED_SETUP_CELL).getValue() != 'Needs set-up') 
   {
     showAlert(`Set-Up Completed ✨`,
     `The set-up was completed. Now you should reload your spreadsheet.`,
@@ -234,23 +234,15 @@ function initialSetup()
   let parentFolderID = DriveApp.getFileById(ActiveSpreadsheet.getId()).getParents().next().getId()
   
   // Prompt for creating a meeting notes template in the users Google Drive instead of using the one in ESN Greecce Google Drive.
-  try 
-  {
-    var alertResponse = showAlert(
-    "📝 Meeting Notes' Template",
-    `You are about to create a meeting agenda using the Meeting Note's template from ESN Greece Google Drive. Do you wish to continue? 
-    
-    By clicking 'No' a Template will be created in your Google Drive and be linked to this Agenda for future use.
-    
-    For one-time meetings it is advised to click 'YES'.
-    `, 
-    ui.ButtonSet.YES_NO)
-  }
-  catch(error)
-  {
-    Logger.log(`Unrecognised response to Create Meeting Notes Template Prompt. Error: ${error}`)
-    return
-  }
+  var alertResponse = showAlert(
+  "📝 Meeting Notes' Template",
+  `You are about to create a meeting agenda using the Meeting Note's template from ESN Greece Google Drive. Do you wish to continue? 
+  
+  By clicking 'No' a Template will be created in your Google Drive and be linked to this Agenda for future use.
+  
+  For one-time meetings it is advised to click 'YES'.
+  `, 
+  ui.ButtonSet.YES_NO)
 
   // This will run if the user clicks on 'NO' and create a copy of the Meeting Notes Template in the user's Googlse Drive in the same folder as the current Agenda. 
   if (alertResponse === ui.Button.NO)
@@ -266,19 +258,54 @@ function initialSetup()
     // Puts the ESN Greece's Meeting Notes Template URL in the Template sheet in the cell 'C9'.
     AGENDA_TEMPLATE_SHEET.getRange(MEETING_NOTES_LINK_CELL).setValue(NOTES_TEMPLATE_DOC_URL).setWrap(true)
   }
-  else 
-  {
-    Logger.log(`Unrecognised response to Create Meeting Notes Template Prompt. `)
-    return
-  }
 
   // Propts the user for Calendar ID. 
-  
+    var alertResponseCalendar = ui.alert(
+    "📅 Add Events to Google Calendar",
+    `Would you wish to also create Google Calendar event for each meeting? 
+
+    The Calendar Event will have the Agenda and the Meeting Notes as attachments and the guset will be invited. This is mandatory if you want to create a Google Meet Link for each meeting (also included in the calendar event).
+    `, 
+    ui.ButtonSet.YES_NO)
+
+    // This will run if the user clicks on 'YES' and will be prompted to add a Google Calendar ID.
+    if (alertResponseCalendar === ui.Button.YES)
+    {
+      var usersCalendarID = ui.prompt(`📅🆔 Input your Calendar ID which you want to create the calendar events. 
+      Works with shared calendars as well.`).getResponseText()
+
+      AGENDA_TEMPLATE_SHEET.getRange(MEETING_CALENDAR_LINK_CELL).setValue(usersCalendarID).setWrap(true)
+    }
+
+   // Propts the user for weekly meeting generation.
+    var alertResponseWeeklyMeeting = ui.alert(
+    "📅 Time-Driven Meeting Creation",
+    `Would you wish to automaticaly create a new meeting every week? 
+
+    This will happen the next week day of the meeting day. This will create a new Agenda, Meeting notes, Calendar event, and Google Meet link and linked them together.
+    
+    If you wish for the meeting to repeat in a different time interval, check the documentation on how to edit the time-driven trigger for the code. 
+    `, 
+    ui.ButtonSet.YES_NO)
+
+    // This will run if the user clicks on 'YES'.
+    if (alertResponseWeeklyMeeting === ui.Button.YES)
+    {
+      // Sets the value of cell 'C2' to 'Time-driven Meeting Generation'.
+      AGENDA_TEMPLATE_SHEET.getRange(TIME_DRIVEN_GENERATION_CELL).setValue(TIME_DRIVEN_GENERATION_TEXT)
+    }
+    // This will run if the user clicks on 'NO'.
+    if (alertResponseWeeklyMeeting === ui.Button.NO)
+    {
+      // Sets the value of cell 'C2' to '' (empty), thus not running automatically.
+      AGENDA_TEMPLATE_SHEET.getRange(TIME_DRIVEN_GENERATION_CELL).setValue("")
+    }
 
   // Set up trigger for Time-driven Meeting Generation of Meetings. 
   ScriptApp.newTrigger('timeTriggered').timeBased().everyWeeks(1).onWeekDay(getWeekDayForTrigger()).atHour(17).create()
 
-  AGENDA_TEMPLATE_SHEET.getRange('C1').setValue('')
+  // Removes the "Needs set-up" from the template sheet in the 'C1' cell. 
+  AGENDA_TEMPLATE_SHEET.getRange(NEED_SETUP_CELL).setValue('')
   
   SpreadsheetApp.flush()
 }
