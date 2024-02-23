@@ -12,6 +12,7 @@ function onOpen()
     menu.addItem("📆 Create New Meeting Essentials","newMeetingEssentialsFromMenu")
   }
 
+  menu.addSeparator()
   menu.addItem("📚 View Documentation","showDocumentation")
   menu.addToUi()
 }
