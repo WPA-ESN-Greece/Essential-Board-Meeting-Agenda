@@ -206,11 +206,14 @@ function calendraEvent(_meetingName, _eventDestination, _eventLocation, _Date, _
   
   if (_guestEmail.length > 0)
   {
-    var attendeesArr = []
+    let attendeesArr = []
 
     for (var i = 0; i < _guestEmail.length; i++)
     {
-      attendeesArr.push({email:_guestEmail[i]})
+      let emailAddressFormated = _guestEmail[i].trimStart()
+      emailAddressFormated = _guestEmail[i].trim()
+      
+      attendeesArr.push({email:emailAddressFormated})
     }
 
     event.attendees = attendeesArr

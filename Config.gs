@@ -54,9 +54,9 @@ let TIMEZONE = Session.getScriptTimeZone()
 const EVENT_DESCRIPTION = "Yet another Meeting..."
 const EVENT_LOCATION = "📞 Google Meet"
 
-  // Guests. Up to 5 fixed Guests.
-  let EVENT_GUESTS = []
-  //Example: EVENT_GUESTS = ["board@esnsection.org"]
+  // Guests email addresses. Also accepts Google Groups/ Mailing Lists.  
+  let EVENT_GUESTS = ss.getRange(MEETING_GUESTS_CELL).getValue().split(",")
+    // Example: EVENT_GUESTS = ["board@esnsection.org"] 
 
 // Calendar ID to create the Event
 const CALENDAR_ID = AGENDA_TEMPLATE_SHEET.getRange('G4').getValue()
