@@ -1,4 +1,4 @@
-const ss = SpreadsheetApp.getActiveSpreadsheet()
+let ActiveSpreadsheet = SpreadsheetApp.getActiveSpreadsheet()
 
 // Agenda Sheet Template
 const AGENDA_TEMPLATE_SHEET = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('#No | Date')
@@ -17,11 +17,13 @@ const MEETING_GUESTS_CELL = "C10"
 
 // Meetings Notes Google Document Template
 const NOTES_TEMPLATE_DOC_URL = "https://docs.google.com/document/d/1yZNtfD299o0RZ4EDJDsBYzwB3hXGOmHvdQ2TtJGThpw/edit" // The one in ESN Greece's Google Drive. 
+// The URL of the copied Meeting Notes Template in the users Google Drive. 
 let NOTES_TEMPLATE_DOC_ID = AGENDA_TEMPLATE_SHEET.getRange(MEETING_NOTES_LINK_CELL).getValue()
 
+// Documentation URL
 const DOCUMENTATION_URL = "https://docs.google.com/document/d/1lKIBvzzRSKa0mBPJoZYAi-dAaDVTO2xH4NJGr-bnxFA/edit?usp=sharing"
 
-
+// Fixed Weekday for the Meeting. 
 let DAY_OF_THE_WEEK = String(AGENDA_TEMPLATE_SHEET.getRange(DAY_OF_THE_WEEK_CELL).getValue())
 
 
@@ -30,7 +32,6 @@ let Time_Driven_Meeting_Generation = AGENDA_TEMPLATE_SHEET.getRange("C2").getVal
 
 
 // Meetings Event Details
-let ActiveSpreadsheet = SpreadsheetApp.getActiveSpreadsheet()
 let MEETIING_NAME = ActiveSpreadsheet.getName().split(" |",1)
 
   // Start Time
@@ -48,16 +49,14 @@ const DATE_FORMAT = "dd/MM/yy"
 let TIMEZONE = Session.getScriptTimeZone()
 
 
-
-
 // Event Details
 const EVENT_DESCRIPTION = "Yet another Meeting..."
 const EVENT_LOCATION = "📞 Google Meet"
 
-  // Guests email addresses. Also accepts Google Groups/ Mailing Lists.  
-  let EVENT_GUESTS = ss.getRange(MEETING_GUESTS_CELL).getValue().split(",")
+  // Guests email addresses. Also accepts Google Groups and Mailing Lists.  
+  let EVENT_GUESTS = ActiveSpreadsheet.getRange(MEETING_GUESTS_CELL).getValue().split(",")
     // Example: EVENT_GUESTS = ["board@esnsection.org"] 
 
-// Calendar ID to create the Event
+// Calendar ID to create the Event. 
 const CALENDAR_ID = AGENDA_TEMPLATE_SHEET.getRange('G4').getValue()
 const CALENDAR_URL = "https://calendar.google.com/calendar/u/0?cid="+CALENDAR_ID+"%40group.calendar.google.com&ctz=Europe%2FAthens"

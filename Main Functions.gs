@@ -157,8 +157,8 @@ function newMeetingEssentials(runFrom)
   // Transers postponed topics to from last meeting to the newest one's agenda.
   SpreadsheetApp.flush()
 
-  let newstAgendaSheet = ss.getSheets()[0]
-  let previousAgenda = ss.getSheets()[1]
+  let newstAgendaSheet = ActiveSpreadsheet.getSheets()[0]
+  let previousAgenda = ActiveSpreadsheet.getSheets()[1]
 
   let postponedTopics = previousAgenda.getRange(12, 1, previousAgenda.getLastRow() - 12, previousAgenda.getLastColumn()).getValues()
 
@@ -167,7 +167,7 @@ function newMeetingEssentials(runFrom)
   postponedTopics.forEach(function(row, index)
   {
     if (row[0] != "⏪") {}
-    else if (row[0] === "⏪")
+    else if (row[0] == "⏪")
     {
       row[6] = "⏪ Topic from [" + previousAgenda.getSheetName() + "]. " + row[6]
       row[0] = "🔲"
@@ -183,14 +183,14 @@ function newMeetingEssentials(runFrom)
 // Runs from Time driven triger.
 function timeTriggered()
 {
-  if (Time_Driven_Meeting_Generation === "Time-driven Meeting Generation")
+  if (Time_Driven_Meeting_Generation == "Time-driven Meeting Generation")
   {
     newMeetingEssentials("trigger")
   }
   else {return}
 }
 
-//Authentication Window
+// Authentication Window
 function authPopUp()
 {
   var ui = SpreadsheetApp.getUi()
@@ -214,25 +214,29 @@ function initialSetup()
 {
   var ui = SpreadsheetApp.getUi()
 
+  // Checks if the set-up is complete. 
   if (AGENDA_TEMPLATE_SHEET.getRange('C1').getValue() != 'Needs set-up') 
   {
     showAlert(`Set-Up Completed ✨`,
     `The set-up was completed. Now you should reload your spreadsheet.`,
     ui.ButtonSet.OK
     )
-    
     return
   }
 
+  // Grants permission to the script by the user who runs the setup. 
   authPopUp()
 
+  // Gets the Meeting Notes Template ID. 
   NOTES_TEMPLATE_DOC_ID = extractDocumentIdFromUrl(NOTES_TEMPLATE_DOC_URL)
-
-  // Create a copy of the Meeting Notes' template in the agendas parent folder.  
-  let parentFolderID = DriveApp.getFileById(ss.getId()).getParents().next().getId()
   
-  // Prompt for creating a meeting notes template in the users Google Drive instead of using the one in ESN Greecce Google Drive. . 
-  var alertResponse = showAlert(
+  // Gets the parent folder ID of the Agenda Spreadsheet file. 
+  let parentFolderID = DriveApp.getFileById(ActiveSpreadsheet.getId()).getParents().next().getId()
+  
+  // Prompt for creating a meeting notes template in the users Google Drive instead of using the one in ESN Greecce Google Drive.
+  try 
+  {
+    var alertResponse = showAlert(
     "📝 Meeting Notes' Template",
     `You are about to create a meeting agenda using the Meeting Note's template from ESN Greece Google Drive. Do you wish to continue? 
     
@@ -241,19 +245,35 @@ function initialSetup()
     For one-time meetings it is advised to click 'YES'.
     `, 
     ui.ButtonSet.YES_NO)
-  
+  }
+  catch(error)
+  {
+    Logger.log(`Unrecognised response to Create Meeting Notes Template Prompt. Error: ${error}`)
+    return
+  }
+
   // This will run if the user clicks on 'NO' and create a copy of the Meeting Notes Template in the user's Googlse Drive in the same folder as the current Agenda. 
   if (alertResponse === ui.Button.NO)
   {
+    // Create a copy of the Meeting Notes' template in the agendas parent folder.  
     let meetingNotesDocTemplate = DriveApp.getFileById(NOTES_TEMPLATE_DOC_ID).makeCopy(`Meeting Notes - Template`, DriveApp.getFolderById(parentFolderID))
-
+    // Puts the newely created Meeting Notes Template URL in the Template sheet in the cell 'C9'.
     AGENDA_TEMPLATE_SHEET.getRange(MEETING_NOTES_LINK_CELL).setValue(meetingNotesDocTemplate.getUrl()).setWrap(true)
   }
   // This will run if the user clicks on 'YES' and pastes the URL of the original Meeting Notes Template in the cell C9 of the template sheet. 
-  if (alertResponse === ui.Button.YES)
+  else if (alertResponse === ui.Button.YES)
   {
+    // Puts the ESN Greece's Meeting Notes Template URL in the Template sheet in the cell 'C9'.
     AGENDA_TEMPLATE_SHEET.getRange(MEETING_NOTES_LINK_CELL).setValue(NOTES_TEMPLATE_DOC_URL).setWrap(true)
   }
+  else 
+  {
+    Logger.log(`Unrecognised response to Create Meeting Notes Template Prompt. `)
+    return
+  }
+
+  // Propts the user for Calendar ID. 
+  
 
   // Set up trigger for Time-driven Meeting Generation of Meetings. 
   ScriptApp.newTrigger('timeTriggered').timeBased().everyWeeks(1).onWeekDay(getWeekDayForTrigger()).atHour(17).create()
