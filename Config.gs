@@ -17,6 +17,7 @@ const MEETING_GUESTS_CELL = "C10"
 const TIME_DRIVEN_GENERATION_CELL = "C2"
 const NEED_SETUP_CELL = "C1"
 const TIME_DRIVEN_GENERATION_TEXT = "Time-driven Meeting Generation"
+const MEET_URL_DEFAULT = "This will generate for every meeting."
 
 // Meetings Notes Google Document Template
 const NOTES_TEMPLATE_DOC_URL = "https://docs.google.com/document/d/1yZNtfD299o0RZ4EDJDsBYzwB3hXGOmHvdQ2TtJGThpw/edit" // The one in ESN Greece's Google Drive. 
@@ -53,8 +54,8 @@ let TIMEZONE = Session.getScriptTimeZone()
 
 
 // Event Details
-const EVENT_DESCRIPTION = "Yet another Meeting..."
-const EVENT_LOCATION = "📞 Google Meet"
+let EVENT_DESCRIPTION = "Yet another Meeting..."
+let EVENT_LOCATION = "📞 Google Meet"
 
   // Guests email addresses. Also accepts Google Groups and Mailing Lists.  
   let EVENT_GUESTS = ActiveSpreadsheet.getRange(MEETING_GUESTS_CELL).getValue().split(",")

@@ -52,12 +52,10 @@ function newMeetingEssentials(runFrom)
         "📆 About your new meeting",
         `You are about to create the essentials ✨ for a meeting on ${Utilities.formatDate(meetingDateToConfirm, TIMEZONE, "EEE dd/MM/yy 'at' HH:mm aaa z")} till ${END_TIME}. Do you wish to continue? To input a custom Date and time, click the "No" button.`, 
         ui.ButtonSet.YES_NO_CANCEL)
-        Logger.log("--- alertResponse "+alertResponse)
-        Logger.log(ui.Button.NO)
       
       if (alertResponse === ui.Button.YES)
       {
-        Logger.log("Yes!")
+        //Logger.log("Yes!")
       }
       else if (alertResponse === ui.Button.CANCEL || alertResponse === ui.Button.CLOSE)
       {
@@ -77,7 +75,7 @@ function newMeetingEssentials(runFrom)
         
         while (validDateOutputObj.status === false)
         {
-          input = ui.prompt("Wrong format 😢. Please try again. When would you like to scedule your meeting? Your answer HAS TO be in the following date & time format: dd/MM/yyyy,HH:mm. Example: 20/09/2023, 13:00-15:30")
+          input = ui.prompt("Wrong format 😢. Please try again. When would you like to scedule your meeting? Your answer HAS TO be in the following date & time format: dd/MM/yyyy, HH:mm. Example: 20/09/2023, 13:00-15:30")
           promptResponseText = input.getResponseText()
           validDateOutputObj = isDateValid(promptResponseText)
 
@@ -91,6 +89,7 @@ function newMeetingEssentials(runFrom)
         }
       }
       else {return}
+      
       Logger.log("Creating  event...")
     // prompt end
   }
@@ -130,7 +129,6 @@ function newMeetingEssentials(runFrom)
   replacePlaceholdersInNotes(meetingTitle, meetingNumber, meetingDate, meetingDateFormated, meetingAgendaURL, meetingNotesDoc, Utilities.formatDate(meetingStartTime, TIMEZONE, "HH:mm"), Utilities.formatDate(meetingEndTime, TIMEZONE, "HH:mm"), EVENT_LOCATION)
 
   // If there is no calendar ID, the calendar features are ignored. 
-  Logger.log("CALENDAR_ID   " + CALENDAR_ID)
   if (!(CALENDAR_ID == "" || CALENDAR_ID == 'Meeting Calendar ID here'))
   {
     // Create Google Calendar Event Object.
@@ -142,11 +140,15 @@ function newMeetingEssentials(runFrom)
     })
     
     let newMeetingEventID = newMeetingEvent.getId()
-
-    // Gets the meeting Google Meet URL.
-    meetingMeetURL = newMeetingEvent.hangoutLink
-    // Puts the Google Meet URL on the new Agenda.
-    linkCellContents('🔗 Google Meet link', meetingMeetURL, newAgendaSheet, MEETING_URL_CELL)
+    
+    // Runs only if the the Meet URL Cell in the Template Sheet matches the text in 'MEET_URL_DEFAULT' found in the config.
+    if (AGENDA_TEMPLATE_SHEET.getRange(MEETING_URL_CELL).getValue() == MEET_URL_DEFAULT)
+    {
+      // Gets the meeting Google Meet URL.
+      meetingMeetURL = newMeetingEvent.hangoutLink
+      // Puts the Google Meet URL on the new Agenda.
+      linkCellContents('🔗 Google Meet link', meetingMeetURL, newAgendaSheet, MEETING_URL_CELL)
+    }
 
     linkCellContents('🔗 Meeting Calendar 📆', CALENDAR_URL, newAgendaSheet, MEETING_CALENDAR_LINK_CELL)
   }
@@ -162,8 +164,7 @@ function newMeetingEssentials(runFrom)
 
   let postponedTopics = previousAgenda.getRange(12, 1, previousAgenda.getLastRow() - 12, previousAgenda.getLastColumn()).getValues()
 
-  Logger.log(postponedTopics)
-
+  // Move topics from the last meeting to ne newely created one if the have the '⏪' status.
   postponedTopics.forEach(function(row, index)
   {
     if (row[0] != "⏪") {}
@@ -175,7 +176,6 @@ function newMeetingEssentials(runFrom)
       newstAgendaSheet.insertRowBefore(13)
 
       newstAgendaSheet.getRange(13,1,1, newstAgendaSheet.getLastColumn()).setValues([row])
-    
     }
   })
 }

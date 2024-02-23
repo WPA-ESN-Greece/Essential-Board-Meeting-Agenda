@@ -1,5 +1,4 @@
 // Gets the ID of a google doc file (Doc, spredsheet, presentation, form), folder or script from its URL.
-
 function extractDocumentIdFromUrl(url) 
 {
   var parts = url.split('/')
@@ -7,11 +6,9 @@ function extractDocumentIdFromUrl(url)
   if (parts[4] == "d")
   {
     var idIndex = parts.indexOf('d') + 1
-    //Logger.log(parts = url.split('/'))
 
     if (idIndex > 0 && idIndex < parts.length) 
     {
-      //Logger.log(parts[idIndex])
       return parts[idIndex]
     } 
     else 
@@ -29,7 +26,6 @@ function extractDocumentIdFromUrl(url)
 
     if (idIndex > 0 && idIndex < parts.length) 
     {
-      //Logger.log(parts[idIndex])
       return parts[idIndex]
     }
     else 
@@ -49,15 +45,14 @@ function extractDocumentIdFromUrl(url)
 
 
 // Creates a Google Callendar Event object
-
 function calendraEvent(_meetingName, _eventDestination, _eventLocation, _Date, _startTime, _endTime, _meetingNumber, _meetingAgendaUrl, _meetingNotesUrl, _guestEmail)
 {
   // Google Calenda API Event Object: https://developers.google.com/calendar/api/v3/reference/events
 
-  var eventStartTimeNdate = new Date(_Date.getFullYear(), _Date.getMonth(), _Date.getDate(), _startTime.getHours(), _startTime.getMinutes())
-  var eventEndTimeNdate = new Date(_Date.getFullYear(), _Date.getMonth(), _Date.getDate(), _endTime.getHours(), _endTime.getMinutes())
+  let eventStartTimeNdate = new Date(_Date.getFullYear(), _Date.getMonth(), _Date.getDate(), _startTime.getHours(), _startTime.getMinutes())
+  let eventEndTimeNdate = new Date(_Date.getFullYear(), _Date.getMonth(), _Date.getDate(), _endTime.getHours(), _endTime.getMinutes())
 
-  //Google Calendar Event Object
+  //Google Calendar Event Object and all of its properties. The commented ones are not in use. 
   let event = {
     //kind: "calendar#event",
     //"etag": etag,
@@ -115,17 +110,17 @@ function calendraEvent(_meetingName, _eventDestination, _eventLocation, _Date, _
       }
     },*/
     //hangoutLink: string,
-    conferenceData: {
+    //conferenceData: {
       //conferenceDataVersion: 1,//
-      createRequest: {
-        requestId: "meet"+_meetingNumber,
-        conferenceSolutionKey: {
-          type: "hangoutsMeet"
-        },
+      //createRequest: {
+        //requestId: "meet"+_meetingNumber,
+        //conferenceSolutionKey: {
+          //type: "hangoutsMeet"
+        //},
         /*"status": {
           "statusCode": string
         }*/
-      },
+      //},
       /*entryPoints: [
         {
           entryPointType: "video",
@@ -148,7 +143,7 @@ function calendraEvent(_meetingName, _eventDestination, _eventLocation, _Date, _
       //"conferenceId": string,
       //"signature": string,
       //"notes": string,
-    },
+    //},
     //"anyoneCanAddSelf": boolean,
     //sendInvites: true,//
     guestsCanInviteOthers: true,
@@ -204,7 +199,8 @@ function calendraEvent(_meetingName, _eventDestination, _eventLocation, _Date, _
     //eventType: "default"
   }
   
-  if (_guestEmail.length > 0)
+  // Adds every comma-seperated email address found in cell 'C10' (Meeting Guests) in the Template Sheet.
+  if (_guestEmail.length > 0 && _guestEmail != "")
   {
     let attendeesArr = []
 
@@ -217,6 +213,29 @@ function calendraEvent(_meetingName, _eventDestination, _eventLocation, _Date, _
     }
 
     event.attendees = attendeesArr
+  }
+  
+  // Gets the Meeting URL value foind in the Template Sheet. 
+  let meetingURLinTemplate = AGENDA_TEMPLATE_SHEET.getRange(MEETING_URL_CELL).getValue()
+  
+  // Runs only if the the Meet URL Cell in the Template Sheet matches the text in 'MEET_URL_DEFAULT' found in the config.
+  if (meetingURLinTemplate == MEET_URL_DEFAULT)
+  {
+    event.conferenceData = {
+        //conferenceDataVersion: 1,
+        createRequest: {
+          requestId: "meet"+_meetingNumber,
+          conferenceSolutionKey: {type: "hangoutsMeet"}
+        }
+      }
+  }
+  // Runs only if the the Meet URL Cell in the Template Sheet does NOT matche the text in 'MEET_URL_DEFAULT' found in the config AND is not empty. 
+  else if (meetingURLinTemplate != "" && meetingURLinTemplate != MEET_URL_DEFAULT)
+  {
+    // Adds the user entered fixed meeting URL in the Events description. 
+    event.description += `
+
+    Meeting Link: ${meetingURLinTemplate}`
   }
 
   return event
