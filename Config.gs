@@ -18,7 +18,7 @@ const TIME_DRIVEN_GENERATION_CELL = "C2"
 const NEED_SETUP_CELL = "C1"
 const NEED_SETUP_TEXT = "Needs set-up"
 const TIME_DRIVEN_GENERATION_TEXT = "Time-driven Meeting Generation"
-const MEET_URL_DEFAULT = "This will generate for every meeting."
+const MEET_URL_DEFAULT = "This will be generated for every meeting."
 const CALENDAR_ID_TEXT = 'Meeting Calendar ID here'
 
 // Meetings Notes Google Document Template
